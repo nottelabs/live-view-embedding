@@ -4,9 +4,9 @@ Minimal Next.js demo embedding the live view of a Notte browser session in an if
 
 Start a session, watch it live, and switch how the viewer is embedded:
 
-- **Mode**: `embed-minimal` (the page only), `embed` (adds the address bar and steps panel), `full` (adds the session header) or `theatre` (the address bar only).
+- **Mode**: `embed-minimal` (the page only), `embed` (adds the address bar and steps panel), `full` (adds the session header) or `theatre` (the address bar only, the default).
 - **Theme**: light or dark, switched live through the viewer's `set-theme` message.
-- **API key**: paste your Notte key ([console.notte.cc](https://console.notte.cc)). It stays in the tab's memory and is only sent to this app's own route, which starts and stops the session.
+- **API key**: paste your Notte key ([console.notte.cc](https://console.notte.cc)). It is saved in this browser's localStorage so it survives a refresh (**clear** removes it), and is only sent to this app's own route, which starts and stops the session.
 - **Open viewer**: opens the session's `viewer_url` exactly as the API returns it.
 
 The iframe takes the browser's shape plus the viewer's own controls, so the page fills it without letterboxing.

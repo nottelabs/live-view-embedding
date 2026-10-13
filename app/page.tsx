@@ -9,6 +9,8 @@ import { USER_KEY_HEADER, redactKey } from "../lib/api-key";
 const DEV_API_KEY =
   process.env.NODE_ENV === "development" ? (process.env.NEXT_PUBLIC_DEV_NOTTE_API_KEY ?? "") : "";
 
+const KEY_STORAGE = "notte-api-key";
+
 // The key a session was started with, so Stop uses the same one.
 type Session = { sessionId: string; viewerUrl: string; defaultViewerUrl: string; apiKey: string };
 
@@ -52,11 +54,26 @@ export default function Page() {
   const [session, setSession] = useState<Session | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("embed-minimal");
+  const [mode, setMode] = useState<Mode>("theatre");
   const [theme, setTheme] = useState<Theme>("light");
-  // The key lives only in this tab's memory and goes to this app's own API route.
+  // The key goes only to this app's own API route. It is kept in this browser's
+  // localStorage so a refresh does not lose it; "clear" removes it.
   // In dev it starts pre-filled from .env.local so it does not need pasting each time.
-  const [apiKey, setApiKey] = useState(DEV_API_KEY);
+  const [apiKey, setApiKeyState] = useState(DEV_API_KEY);
+  const setApiKey = (key: string) => {
+    setApiKeyState(key);
+    try {
+      if (key) localStorage.setItem(KEY_STORAGE, key);
+      else localStorage.removeItem(KEY_STORAGE);
+    } catch {}
+  };
+  // Read after mount, so the server render and the first client render match.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(KEY_STORAGE);
+      if (saved) setApiKeyState(saved);
+    } catch {}
+  }, []);
   const [keyDraft, setKeyDraft] = useState("");
   const keyHeaders = (key: string): Record<string, string> => (key ? { [USER_KEY_HEADER]: key } : {});
   const iframeRef = useRef<HTMLIFrameElement>(null);
