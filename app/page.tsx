@@ -20,10 +20,8 @@ const LOCAL_CONSOLE = "http://localhost:3333";
 // console reaches it through a local CORS proxy.
 const LOCAL_API_PROXY = "ws://localhost:8787";
 
-const ALL_MODES = ["embed-minimal", "embed", "full", "theatre"] as const;
-type Mode = (typeof ALL_MODES)[number];
-// theatre is not in the production viewer yet, so it is offered only with the local viewer.
-const MODES: readonly Mode[] = LOCAL_VIEWER ? ALL_MODES : ALL_MODES.filter((m) => m !== "theatre");
+const MODES = ["embed-minimal", "embed", "full", "theatre"] as const;
+type Mode = (typeof MODES)[number];
 
 // Default page area of a Notte session: a 1365x768 window minus 87 px of emulated
 // browser chrome (stealth_persona.py in notte-api).
@@ -31,15 +29,9 @@ const BROWSER_WIDTH = 1365;
 const BROWSER_HEIGHT = 681;
 // Height the viewer's own controls take above the page, measured per mode.
 const VIEWER_CHROME_PX: Record<Mode, number> = { "embed-minimal": 0, theatre: 40, embed: 84, full: 92 };
-// Whenever the address bar shows, the production viewer keeps a 30 px gutter around the
-// page (15 px per side, in both directions). The local viewer build removes it.
-const GUTTER_PX: Record<Mode, number> = LOCAL_VIEWER
-  ? { "embed-minimal": 0, theatre: 0, embed: 0, full: 0 }
-  : { "embed-minimal": 0, theatre: 30, embed: 30, full: 30 };
-
+// The viewer fills the frame edge to edge in every mode, so only its controls add height.
 function boxHeight(mode: Mode) {
-  const g = GUTTER_PX[mode];
-  return `calc((100cqw - ${g}px) * ${BROWSER_HEIGHT} / ${BROWSER_WIDTH} + ${g + VIEWER_CHROME_PX[mode]}px)`;
+  return `calc(100cqw * ${BROWSER_HEIGHT} / ${BROWSER_WIDTH} + ${VIEWER_CHROME_PX[mode]}px)`;
 }
 
 const THEMES = ["light", "dark"] as const;
