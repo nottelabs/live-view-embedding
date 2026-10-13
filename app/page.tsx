@@ -14,14 +14,6 @@ const KEY_STORAGE = "notte-api-key";
 // The key a session was started with, so Stop uses the same one.
 type Session = { sessionId: string; viewerUrl: string; defaultViewerUrl: string; apiKey: string };
 
-// Dev-only: load the viewer from a local console build instead of console.notte.cc.
-// Off by default, so a deployed copy always uses the production viewer.
-const LOCAL_VIEWER = process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_LOCAL_VIEWER === "1";
-const LOCAL_CONSOLE = "http://localhost:3333";
-// The production API only accepts browser calls from notte.cc origins, so a local
-// console reaches it through a local CORS proxy.
-const LOCAL_API_PROXY = "ws://localhost:8787";
-
 const MODES = ["embed-minimal", "embed", "full", "theatre"] as const;
 type Mode = (typeof MODES)[number];
 
@@ -42,12 +34,7 @@ type Theme = (typeof THEMES)[number];
 function viewerSrc(viewerUrl: string, mode: Mode) {
   const url = new URL(viewerUrl);
   url.searchParams.set("mode", mode);
-  if (!LOCAL_VIEWER) return url.toString();
-  const ws = new URL(url.searchParams.get("ws") ?? "");
-  const local = new URL("/static/viewer", LOCAL_CONSOLE);
-  url.searchParams.forEach((value, key) => local.searchParams.set(key, value));
-  local.searchParams.set("ws", `${LOCAL_API_PROXY}${ws.pathname}`);
-  return local.toString();
+  return url.toString();
 }
 
 export default function Page() {
@@ -146,7 +133,7 @@ export default function Page() {
         {apiKey ? (
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <input value={redactKey(apiKey)} readOnly aria-label="API key in use" style={{ width: 190, fontFamily: "monospace" }} />
-            <button onClick={() => setApiKey("")} title="Remove this key and use the default">clear</button>
+            <button onClick={() => setApiKey("")} title="Forget this key">clear</button>
           </span>
         ) : (
           <input

@@ -25,3 +25,7 @@ To skip pasting the key in development, copy `.env.example` to `.env.local` and 
 ## How it works
 
 `POST /api/session` starts a session (no proxies, default viewport), opens DuckDuckGo in it, and returns its `viewer_url`. The page adds `mode` and `interactive=1` and renders it in an iframe. `DELETE /api/session` stops the session. See the [embedding guide](https://docs.notte.cc/features/sessions/embed-iframe).
+
+## License
+
+MIT
